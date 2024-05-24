@@ -35,9 +35,9 @@ public class TestHelper {
             }
         }
 
-        File folderPath = Paths.get("texts").toFile();
-        if (!folderPath.exists()) {
-            folderPath.mkdirs();
+        File textsFile = Paths.get("texts").toFile();
+        if (!textsFile.exists()) {
+            textsFile.mkdirs();
         }
 
         String timestamp = getTimestamp();
