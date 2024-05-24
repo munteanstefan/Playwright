@@ -63,11 +63,10 @@ public class PlaywrightExample {
     }
 
     @Test
-    public void tryToLoginWrongCredentails(){
+    public void tryToLoginWrongCredentials(){
         dafabetMainPage.shouldSeeExpectedTitle();
         dafabetMainPage.login("username", "password");
         dafabetMainPage.shouldSeeLoginErrorMessage();
-
     }
 
     @AfterEach
