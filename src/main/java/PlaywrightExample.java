@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlaywrightExample extends StringsHelper {
+public class PlaywrightExample  {
     private static Playwright playwright;
     private static Browser browser;
-    private static Page mainPage;
+    private static Page page;
+    private MainPage mainPage;
     private PromotionPage promotionPage;
     private PokerStarsRewardsPage pokerStarsRewardsPage;
     TestHelper testHelper = new TestHelper();
@@ -19,7 +20,7 @@ public class PlaywrightExample extends StringsHelper {
                 //   .setProxy("socks5://185.74.81.25:61504") // Can be used if needed different legislation or context
                 .setArgs(Arrays.asList("--start-fullscreen"));
         browser = playwright.chromium().launch(options);
-        mainPage = browser.newPage();
+        page = browser.newPage();
 
     }
 
@@ -34,34 +35,42 @@ public class PlaywrightExample extends StringsHelper {
     }
 
     @BeforeEach
-    public void handleCookies() {
-        promotionPage = new PromotionPage(mainPage);
-        pokerStarsRewardsPage = new PokerStarsRewardsPage(mainPage);
-        mainPage.navigate(baseURL);
+    public void startTestsAndHandleCookies() {
+        promotionPage = new PromotionPage(page);
+        pokerStarsRewardsPage = new PokerStarsRewardsPage(page);
+        mainPage = new MainPage(page);
+        mainPage.navigateToHomePage();
+
         // Check if the accept cookies button is visible before clicking it
-        if (mainPage.isVisible(acceptCookiesButton)) {
-            mainPage.click(acceptCookiesButton);
+        if (page.isVisible(mainPage.acceptCookiesButton)) {
+            page.click(mainPage.acceptCookiesButton);
         } else {
             System.out.println("Accept cookies button is not visible. Skipping click.");
         }
     }
 
     @Test
+    public void assertMainPageTitle(){
+        mainPage.navigateToHomePage();
+        mainPage.shouldSeeExpectedTitle();
+    }
+
+    @Test
     public void promotionPageSaveAllLinks() throws IOException {
         promotionPage.navigateToPromotions();
         assertEquals(promotionPage.getExpectedTitle(), promotionPage.getTitle(), "Page title is not as expected");
-        testHelper.saveLinksToFile(mainPage);
+        testHelper.saveLinksToFile(page);
     }
 
     @Test
     public void pokerStarsRewardsPageSaveAllLinks() throws IOException {
         pokerStarsRewardsPage.navigateToPokerStarsRewards();
         assertEquals(pokerStarsRewardsPage.getExpectedTitle(), pokerStarsRewardsPage.getTitle(), "Page title is not as expected");
-        testHelper.saveLinksToFile(mainPage);
+        testHelper.saveLinksToFile(page);
     }
 
     @AfterEach
     public void tearDown(TestInfo testInfo) {
-        testHelper.captureScreenshot(mainPage, testInfo.getDisplayName());
+        testHelper.captureScreenshot(page, testInfo.getDisplayName());
     }
 }
