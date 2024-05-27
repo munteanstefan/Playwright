@@ -9,18 +9,17 @@ public class PlaywrightExample {
     private static Page page;
     private PromotionPage promotionPage;
     private DafabetVipPage dafabetVipPage;
-    private DafabetMainPage dafabetMainPage;
+    private static DafabetMainPage dafabetMainPage;
     TestHelper testHelper = new TestHelper();
 
     @BeforeAll
-    public static void Setup() {
+    public static void setup() {
         playwright = Playwright.create();
-        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(false)
+        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(false);
                 //   .setProxy("socks5://185.74.81.25:61504") // Can be used if needed different legislation or context
-                .setArgs(Arrays.asList("--start-fullscreen"));
+                //.setArgs(Arrays.asList("--start-maximized"));
         browser = playwright.chromium().launch(options);
         page = browser.newPage();
-
     }
 
     @AfterAll
@@ -34,39 +33,35 @@ public class PlaywrightExample {
     }
 
     @BeforeEach
-    public void initializePagesAndNavigateToHomePage() {
-        dafabetMainPage = new DafabetMainPage(page);
-        promotionPage = new PromotionPage(page);
-        dafabetVipPage = new DafabetVipPage(page);
+    public void handleCookies() {
+        DafabetMainPage dafabetMainPage = new DafabetMainPage(page);
         dafabetMainPage.navigateToHomePage();
-
         // Check if the accept cookies button is visible before clicking it
-//        if (mainPage.isVisible(acceptCookiesButton)) {
-//            mainPage.click(acceptCookiesButton);
-//        } else {
-//            System.out.println("Accept cookies button is not visible. Skipping click.");
-//        }
-    }
-
-    @Test
-    public void promotionPageSaveAllLinks() throws IOException {
-        promotionPage.navigateToPromotions();
-        promotionPage.shouldSeeExpectedTitle();
-        testHelper.saveLinksToFile(page);
-    }
-
-    @Test
-    public void dafabetVipPageSaveAllLinks() throws IOException {
-        dafabetVipPage.navigateToDafabetVip();
-        dafabetVipPage.shouldSeeExpectedTitle();
-        testHelper.saveLinksToFile(page);
+        dafabetMainPage.handleCookies();
     }
 
     @Test
     public void tryToLoginWrongCredentials(){
-        dafabetMainPage.shouldSeeExpectedTitle();
+        dafabetMainPage = new DafabetMainPage(page);
+        dafabetMainPage.assertHomePageTitle();
         dafabetMainPage.login("username", "password");
         dafabetMainPage.shouldSeeLoginErrorMessage();
+    }
+
+    @Test
+    public void promotionPageSaveAllLinks() throws IOException {
+        promotionPage = new PromotionPage(page);
+        promotionPage.navigateToPromotions();
+        promotionPage.assertHomePageTitle();
+        testHelper.saveLinksToFile(page);
+    }
+
+    @Test
+    public void vipPageSaveAllLinks() throws IOException {
+        dafabetVipPage = new DafabetVipPage(page);
+        dafabetVipPage.navigateToDafabetVip();
+        dafabetVipPage.assertHomePageTitle();
+        testHelper.saveLinksToFile(page);
     }
 
     @AfterEach

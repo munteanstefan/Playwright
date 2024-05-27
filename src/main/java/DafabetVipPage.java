@@ -1,4 +1,5 @@
 import com.microsoft.playwright.Page;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -24,7 +25,8 @@ public class DafabetVipPage {
     public String getTitle() {
         return page.title();
     }
-    public void shouldSeeExpectedTitle(){
+
+    public void assertHomePageTitle() {
         assertEquals(getExpectedTitle(), getTitle(), "Page title is not as expected");
     }
 }

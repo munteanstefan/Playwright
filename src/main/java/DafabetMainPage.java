@@ -1,8 +1,9 @@
 import com.microsoft.playwright.Page;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DafabetMainPage {
-    String acceptCookiesButton = "//button[@id='onetrust-accept-btn-handler']";
+    String acceptCookiesButton = "//span[@class='cookie-notif-close']";
     String baseURL = "https://www.dafabet.com";
     String homePageTitle = "Dafabet is The Most Secure Online Betting Company in Asia";
     String loginErrorMessage = "Sorry the Username and Password you entered do not match. Please try again.";
@@ -13,6 +14,13 @@ public class DafabetMainPage {
         this.page = page;
     }
 
+    public void handleCookies(){
+        if (page.isVisible(acceptCookiesButton)) {
+            page.click(acceptCookiesButton);
+        } else {
+            System.out.println("Accept cookies button is not visible. Skipping click.");
+        }
+    }
     public void navigateToHomePage() {
         page.navigate(baseURL);
     }
@@ -25,7 +33,7 @@ public class DafabetMainPage {
         return page.title();
     }
 
-    public void shouldSeeExpectedTitle() {
+    public void assertHomePageTitle() {
         assertEquals(getExpectedTitle(), getTitle(), "Page title is not as expected");
     }
 
