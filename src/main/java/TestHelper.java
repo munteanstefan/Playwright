@@ -1,16 +1,14 @@
-import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Page;
+import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.LoadState;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.json.*;
+import java.io.*;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 
 public class TestHelper {
 
@@ -70,5 +68,38 @@ public class TestHelper {
 
     private static String getTimestamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss HH_dd_MM_yyyy"));
+    }
+
+    public static void assertElementContainsText(Page page, String xpath, String expectedText) {
+        // Find the element by XPath
+        String actualText = page.textContent(xpath);
+
+        // Assert that the element contains the expected text
+        if (actualText.contains(expectedText)) {
+            System.out.println("Element contains the expected text: " + expectedText);
+        } else {
+            System.err.println("Element does not contain the expected text: " + expectedText);
+        }
+    }
+
+    public static void getQuote() throws JSONException {
+        // Make a GET request to the API endpoint
+        Response response = RestAssured.get("https://api.quotable.io/random");
+
+        // Check if the response is successful
+        if (response.getStatusCode() == 200) {
+            // Get the JSON response body
+            String responseBody = response.getBody().asString();
+
+            // Parse the JSON response
+            JSONObject jsonObject = new JSONObject(responseBody);
+
+            // Extract the "content" field from the JSON object
+            String content = jsonObject.getString("content");
+
+            System.out.println("Quote of the Day: " + content);
+        } else {
+            System.err.println("Failed to fetch quote. Status code: " + response.getStatusCode());
+        }
     }
 }

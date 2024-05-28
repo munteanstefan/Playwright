@@ -1,4 +1,5 @@
 import com.microsoft.playwright.*;
+import org.json.JSONException;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,8 +10,8 @@ public class PlaywrightExample {
     private static Page page;
     private PromotionPage promotionPage;
     private DafabetVipPage dafabetVipPage;
-    private static DafabetMainPage dafabetMainPage;
-    TestHelper testHelper = new TestHelper();
+    private DafabetMainPage dafabetMainPage;
+    static TestHelper testHelper = new TestHelper();
 
     @BeforeAll
     public static void setup() {
@@ -23,13 +24,15 @@ public class PlaywrightExample {
     }
 
     @AfterAll
-    public static void cleanup() {
+    public static void cleanup() throws JSONException {
         if (browser != null) {
             browser.close();
         }
         if (playwright != null) {
             playwright.close();
         }
+        //a sample of api call
+        testHelper.getQuote();
     }
 
     @BeforeEach
@@ -53,6 +56,7 @@ public class PlaywrightExample {
         promotionPage = new PromotionPage(page);
         promotionPage.navigateToPromotions();
         promotionPage.assertHomePageTitle();
+        testHelper.assertElementContainsText(page,promotionPage.getPromotionsXPath(),"Promotions" );
         testHelper.saveLinksToFile(page);
     }
 

@@ -27,4 +27,7 @@ public class PromotionPage {
     public void assertHomePageTitle() {
         assertEquals(getExpectedTitle(), getTitle(), "Page title is not as expected");
     }
+    public String getPromotionsXPath() {
+        return promotions;
+    }
 }
