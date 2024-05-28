@@ -16,9 +16,9 @@ public class PlaywrightExample  {
     @BeforeAll
     public static void Setup() {
         playwright = Playwright.create();
-        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(false)
+        BrowserType.LaunchOptions options = new BrowserType.LaunchOptions().setHeadless(false);
                 //   .setProxy("socks5://185.74.81.25:61504") // Can be used if needed different legislation or context
-                .setArgs(Arrays.asList("--start-fullscreen"));
+                //.setArgs(Arrays.asList("--start-fullscreen"));
         browser = playwright.chromium().launch(options);
         page = browser.newPage();
 
@@ -36,8 +36,6 @@ public class PlaywrightExample  {
 
     @BeforeEach
     public void startTestsAndHandleCookies() {
-        promotionPage = new PromotionPage(page);
-        pokerStarsRewardsPage = new PokerStarsRewardsPage(page);
         mainPage = new MainPage(page);
         mainPage.navigateToHomePage();
 
@@ -57,6 +55,7 @@ public class PlaywrightExample  {
 
     @Test
     public void promotionPageSaveAllLinks() throws IOException {
+        promotionPage = new PromotionPage(page);
         promotionPage.navigateToPromotions();
         assertEquals(promotionPage.getExpectedTitle(), promotionPage.getTitle(), "Page title is not as expected");
         testHelper.saveLinksToFile(page);
@@ -64,6 +63,7 @@ public class PlaywrightExample  {
 
     @Test
     public void pokerStarsRewardsPageSaveAllLinks() throws IOException {
+        pokerStarsRewardsPage = new PokerStarsRewardsPage(page);
         pokerStarsRewardsPage.navigateToPokerStarsRewards();
         assertEquals(pokerStarsRewardsPage.getExpectedTitle(), pokerStarsRewardsPage.getTitle(), "Page title is not as expected");
         testHelper.saveLinksToFile(page);

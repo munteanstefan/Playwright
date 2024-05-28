@@ -1,5 +1,7 @@
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.LoadState;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,22 +27,38 @@ public class TestHelper {
     }
 
     public static void saveLinksToFile(Page page) throws IOException {
+        // Use an event listener to wait for the load event
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+        // Query all <a> elements with an 'href' attribute on the page
         List<ElementHandle> linkElements = page.querySelectorAll("//a[@href]");
+
+        // Create a set to store unique links
         Set<String> uniqueLinks = new HashSet<>();
 
         for (ElementHandle link : linkElements) {
+            // Get the value of the 'href' attribute
             String href = link.getAttribute("href");
+
+            // Check if the 'href' value is not null or empty after trimming
             if (href != null && !href.trim().isEmpty()) {
+                // Add the trimmed 'href' value to the set of unique links
                 uniqueLinks.add(href.trim());
             }
         }
 
-        File folderPath = Paths.get("texts").toFile();
-        if (!folderPath.exists()) {
-            folderPath.mkdirs();
-        }
-
+        createTextsDirectoryIfNotExists();
         String timestamp = getTimestamp();
+        writeLinksToFile(uniqueLinks, timestamp);
+    }
+
+    private static void createTextsDirectoryIfNotExists() {
+        File textsDirectory = Paths.get("texts").toFile();
+        if (!textsDirectory.exists()) {
+            textsDirectory.mkdirs();
+        }
+    }
+
+    private static void writeLinksToFile(Set<String> uniqueLinks, String timestamp) throws IOException {
         try (FileWriter writer = new FileWriter("texts/All_Links_" + timestamp + ".txt")) {
             for (String link : uniqueLinks) {
                 writer.write(link + "\n");
@@ -49,6 +67,6 @@ public class TestHelper {
     }
 
     private static String getTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss HH_dd_MM_yyyy"));
     }
 }
